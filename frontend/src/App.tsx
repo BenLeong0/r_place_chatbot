@@ -1,25 +1,36 @@
+import { useRef } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
 function App() {
-    const socket = new WebSocket('ws://localhost:5000');
+    const ws = useRef<WebSocket>();
 
-    socket.addEventListener('open', (event) => {
-        console.log("Connected to server");
-    });
+    const connectToSocket = () => {
+        if (ws.current != null){
+            ws.current.close();
+        }
+        ws.current = new WebSocket('ws://localhost:5000');
 
-    socket.addEventListener('message', (event) => {
-        console.log("Message from server:", event.data);
-    });
+        ws.current.addEventListener('open', (event) => {
+            console.log("Connected to server");
+        });
+
+        ws.current.addEventListener('message', (event) => {
+            console.log("[Message from server]", event.data);
+        });
+    }
 
     const sendMessage = (message: string) => {
-        socket.send(message);
+        if (ws.current != null){
+            ws.current.send(message);
+        }
     }
 
     return (
         <div className="App">
             <header className="App-header">
                 <img src={logo} className="App-logo" alt="logo" />
+                <button onClick={connectToSocket}>reconnect</button>
                 <button onClick={() => {sendMessage("hi")}}>send "hi" to the server</button>
             </header>
         </div>

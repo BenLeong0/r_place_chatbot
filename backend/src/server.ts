@@ -28,7 +28,11 @@ wss.on("connection", (ws: WebSocket) => {
 })
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Hello');
+    console.log("hey")
+    wss.clients.forEach(client => {
+        console.log(client.readyState)
+    })
+    res.send([...wss.clients].join(" | "));
 });
 
 
