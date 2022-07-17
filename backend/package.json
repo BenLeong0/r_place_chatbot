@@ -3,11 +3,21 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon server.js"
+    "start": "node dist/server.js",
+    "devStart": "yarn run nodemon src/server.ts",
+    "build": "tsc -p ."
   },
   "license": "MIT",
   "dependencies": {
+    "@types/ws": "^8.5.3",
     "express": "^4.18.1",
-    "nodemon": "^2.0.19"
+    "nodemon": "^2.0.19",
+    "ws": "^8.8.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^18.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
   }
 }
