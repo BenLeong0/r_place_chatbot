@@ -9,7 +9,7 @@ function App() {
         if (ws.current != null){
             ws.current.close();
         }
-        ws.current = new WebSocket('ws://localhost:5000');
+        ws.current = new WebSocket('ws://localhost:5000/4qs');
 
         ws.current.addEventListener('open', (event) => {
             console.log("Connected to server");
