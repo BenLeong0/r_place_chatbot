@@ -20,11 +20,11 @@ wss.on("connection", (ws: WebSocket) => {
     ws.on("message", (message) => {
         console.log(`Received message: ${message}`);
         broadcastMessage(`Received a message: ${message}`);
-    })
+    });
 
     ws.on("close", () => {
         console.log("client disconnected")
-    })
+    });
 })
 
 app.get('/', (req: Request, res: Response) => {
