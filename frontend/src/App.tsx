@@ -5,15 +5,15 @@ function App() {
     const socket = new WebSocket('ws://localhost:5000');
 
     socket.addEventListener('open', (event) => {
-        console.log("Connected to server")
+        console.log("Connected to server");
     });
 
     socket.addEventListener('message', (event) => {
-        console.log("Message from server:", event.data)
-    })
+        console.log("Message from server:", event.data);
+    });
 
     const sendMessage = (message: string) => {
-        socket.send(message)
+        socket.send(message);
     }
 
     return (
