@@ -60,16 +60,15 @@ app.post('/update', (req: Request, res: Response) => {
         return;
     }
 
-    console.log(`Updating "${imageId}": setting (${x}, ${y}) to ${colour}`);
-
     const imagePath = getImagePath(imageId);
-
     if (!fs.existsSync(imagePath)) {
         // TODO: Implement createImage
-        console.log("Image doesn't exist yet.");
+        console.log(`Image "${imageId}" doesn't exist (yet)`);
         res.end();
         return;
     }
+
+    console.log(`Updating "${imageId}": setting (${x}, ${y}) to ${colour}`);
 
     fs.readFile(imagePath, async (err, data) => {
         if (err) throw err;
@@ -97,7 +96,7 @@ app.post('/update', (req: Request, res: Response) => {
 
 
 const isAlphanumeric = (s: string): boolean => {
-    return !/^\w+$/.test(s);
+    return /^\w+$/.test(s);
 }
 
 
