@@ -1,7 +1,7 @@
 import { Canvas, loadImage } from 'canvas';
 import * as fs from 'fs';
 
-export const createNewImage = (
+export const generateNewImage = (
     imagePath: string,
     width: number = 20,
     height: number = 20,
