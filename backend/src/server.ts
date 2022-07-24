@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import { isAlphanumeric, getImagePath } from './utils';
 
 import { UpdateRequestBody } from './types/UpdateRequest';
+import { updateImage } from './image_utils';
 
 
 const app: Application = express();
@@ -70,21 +71,7 @@ app.post('/update', (req: Request, res: Response) => {
     }
 
     console.log(`Updating "${imageId}": setting (${x}, ${y}) to ${colour}`);
-
-    fs.readFile(imagePath, async (err, data) => {
-        if (err) throw err;
-        const img = await loadImage(data);
-        const canvas = new Canvas(img.width, img.height);
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-
-        ctx.fillStyle = colour;
-        ctx.fillRect(x, y, 1, 1);
-
-        const newImageBuffer = canvas.toBuffer('image/png');
-        fs.writeFileSync(imagePath, newImageBuffer);
-    })
+    updateImage(imagePath, colour, x, y);
 
     broadcastMessage(JSON.stringify({
         "event": "imageUpdate",
