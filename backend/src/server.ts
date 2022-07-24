@@ -42,6 +42,7 @@ app.get('/:imageId', (req: Request, res: Response) => {
     if (!fs.existsSync(imagePath)) {
         // TODO: Implement createImage
         console.log("Image doesn't exist yet.");
+        res.end();
         return;
     }
 
@@ -55,6 +56,7 @@ app.post('/update', (req: Request, res: Response) => {
 
     if (!isAlphanumeric(imageId)) {
         console.log(`Invalid image id: ${imageId}`);
+        res.end();
         return;
     }
 
@@ -65,6 +67,7 @@ app.post('/update', (req: Request, res: Response) => {
     if (!fs.existsSync(imagePath)) {
         // TODO: Implement createImage
         console.log("Image doesn't exist yet.");
+        res.end();
         return;
     }
 
