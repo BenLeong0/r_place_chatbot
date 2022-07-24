@@ -12,14 +12,14 @@ export const generateNewImage = (
     const ctx = canvas.getContext('2d');
 
     if (typeof colour === "undefined") {
+        // Create standard white/grey "transparent" grid
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
                 ctx.fillStyle = (x + y) % 2 ? "#DFDFDF" : "#FFFFFF";
                 ctx.fillRect(x, y, 1, 1);
             }
         }
-    }
-    else {
+    } else {
         ctx.fillStyle = colour;
         ctx.fillRect(0, 0, width, height);
     }
