@@ -88,7 +88,7 @@ app.post('/create', (req: Request, res: Response) => {
 
     const imagePath = getImagePath(imageId);
     if (fileExists(imagePath)) {
-        console.log(`Image ${imageId} already exists`)
+        console.log(`Image ${imageId} already exists`);
         res.end();
         return;
     }
