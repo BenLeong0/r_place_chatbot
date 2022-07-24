@@ -39,7 +39,6 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
 
 app.get('/:imageId', (req: Request, res: Response) => {
     const imageId = req.params.imageId;
-    const imagePath = getImagePath(imageId);
 
     if (!isAlphanumeric(imageId)) {
         console.log(`Invalid image id: ${imageId}`);
@@ -47,6 +46,7 @@ app.get('/:imageId', (req: Request, res: Response) => {
         return;
     }
 
+    const imagePath = getImagePath(imageId);
     generateNewImageIfFileNonExistent(imagePath);
 
     res.sendFile(imagePath, { root: "." });
