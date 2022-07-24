@@ -1,6 +1,7 @@
 import { Canvas, loadImage } from 'canvas';
 import * as fs from 'fs';
 
+
 export const generateNewImage = (
     imagePath: string,
     width: number = 20,
@@ -26,7 +27,6 @@ export const generateNewImage = (
     const newImageBuffer = canvas.toBuffer('image/png');
     fs.writeFileSync(imagePath, newImageBuffer);
 }
-
 
 
 export const updateImage = (
