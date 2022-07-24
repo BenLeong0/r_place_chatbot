@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import { isAlphanumeric, getImagePath } from './utils';
 
 import { UpdateRequestBody } from './types/UpdateRequest';
-import { generateNewImage, updateImage } from './image_utils';
+import { generateNewImage, generateNewImageIfFileNonExistent, updateImage } from './image_utils';
 
 
 const app: Application = express();
@@ -47,10 +47,7 @@ app.get('/:imageId', (req: Request, res: Response) => {
         return;
     }
 
-    if (!fs.existsSync(imagePath)) {
-        console.log(`Generating image "${imageId}"`);
-        generateNewImage(imagePath);
-    }
+    generateNewImageIfFileNonExistent(imagePath);
 
     res.sendFile(imagePath, { root: "." });
 });
@@ -67,10 +64,7 @@ app.post('/update', (req: Request, res: Response) => {
     }
 
     const imagePath = getImagePath(imageId);
-    if (!fs.existsSync(imagePath)) {
-        console.log(`Generating image "${imageId}"`);
-        generateNewImage(imagePath);
-    }
+    generateNewImageIfFileNonExistent(imagePath);
 
     console.log(`Updating "${imageId}": setting (${x}, ${y}) to ${colour}`);
     updateImage(imagePath, colour, x, y);

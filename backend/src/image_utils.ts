@@ -29,6 +29,14 @@ export const generateNewImage = (
 }
 
 
+export const generateNewImageIfFileNonExistent = (imagePath: string): void => {
+    if (!fs.existsSync(imagePath)) {
+        console.log(`Generating image at ${imagePath}`);
+        generateNewImage(imagePath);
+    }
+}
+
+
 export const updateImage = (
     imagePath: string,
     colour: string,
