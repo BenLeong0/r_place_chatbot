@@ -1,19 +1,16 @@
 import express, { Application, Request, Response } from 'express';
 import WebSocket from 'ws';
 
-import { Canvas, loadImage } from 'canvas';
-import * as fs from 'fs';
+import { isAlphanumeric, getImagePath, fileExists } from './utils';
 
-import { isAlphanumeric, getImagePath } from './utils';
-
-import { UpdateRequestBody } from './types/UpdateRequest';
+import { CreateRequestBody, UpdateRequestBody } from './types/UpdateRequest';
+import { generateNewImage, generateNewImageIfFileNonExistent, updateImage } from './image_utils';
 
 
 const app: Application = express();
 app.use(express.json());
 
 const server = app.listen(5000, () => console.log("Server running"));
-
 const wss = new WebSocket.Server({ server });
 
 const broadcastMessage = (message: string) => {
@@ -39,14 +36,15 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
 
 app.get('/:imageId', (req: Request, res: Response) => {
     const imageId = req.params.imageId;
-    const imagePath = getImagePath(imageId);
 
-    if (!fs.existsSync(imagePath)) {
-        // TODO: Implement createImage
-        console.log("Image doesn't exist yet.");
+    if (!isAlphanumeric(imageId)) {
+        console.log(`Invalid image id: ${imageId}`);
         res.end();
         return;
     }
+
+    const imagePath = getImagePath(imageId);
+    generateNewImageIfFileNonExistent(imagePath);
 
     res.sendFile(imagePath, { root: "." });
 });
@@ -63,35 +61,45 @@ app.post('/update', (req: Request, res: Response) => {
     }
 
     const imagePath = getImagePath(imageId);
-    if (!fs.existsSync(imagePath)) {
-        // TODO: Implement createImage
-        console.log(`Image "${imageId}" doesn't exist (yet)`);
+    generateNewImageIfFileNonExistent(imagePath);
+
+    console.log(`Updating "${imageId}": setting (${x}, ${y}) to ${colour}`);
+    updateImage(imagePath, colour, x, y);
+
+    broadcastMessage(JSON.stringify({
+        event: "imageUpdate",
+        imageId: imageId,
+    }));
+
+    res.json({ success: true });
+
+});
+
+
+app.post('/create', (req: Request, res: Response) => {
+    const updateRequestBody: CreateRequestBody = req.body;
+    const { imageId, width = 20, height = 20, colour = undefined } = updateRequestBody;
+
+    if (!isAlphanumeric(imageId)) {
+        console.log(`Invalid image id: ${imageId}`);
         res.end();
         return;
     }
 
-    console.log(`Updating "${imageId}": setting (${x}, ${y}) to ${colour}`);
+    const imagePath = getImagePath(imageId);
+    if (fileExists(imagePath)) {
+        console.log(`Image ${imageId} already exists`);
+        res.end();
+        return;
+    }
 
-    fs.readFile(imagePath, async (err, data) => {
-        if (err) throw err;
-        const img = await loadImage(data);
-        const canvas = new Canvas(img.width, img.height);
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-
-        ctx.fillStyle = colour;
-        ctx.fillRect(x, y, 1, 1);
-
-        const newImageBuffer = canvas.toBuffer('image/png');
-        fs.writeFileSync(imagePath, newImageBuffer);
-    })
+    generateNewImage(imagePath, width, height, colour);
 
     broadcastMessage(JSON.stringify({
-        "event": "imageUpdate",
+        "event": "imageCreate",
         "imageId": imageId
     }));
 
-    res.json(req.body);
+    res.json({ success: true });
 
 });
