@@ -1,30 +1,41 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, useParams } from "react-router-dom";
 
 import './App.css';
 
 
 function App() {
+    return (
+        <Router>
+            <Routes>
+                <Route path={'/:imageId'} element={<Canvas />} />
+            </Routes>
+        </Router>
+    );
+}
 
-    const [userId, setUserId] = useState<string>("4qs");
-    const [imgUrl, setImgUrl] = useState<string>("");
 
-    const getHash = (): string => {
-        const newHash = Math.floor(99999999 * Math.random());
-        return newHash.toString().padStart(8, "0");
+const Canvas: React.FC = () => {
+    const { imageId } = useParams<Readonly<{ imageId: string }>>();
+    const [hash, setHash] = useState<string>("");
+
+    const updateHash = (): void => {
+        const newHashValue = Math.floor(99999999 * Math.random());
+        const newHash = newHashValue.toString().padStart(8, "0");
+        setHash(newHash);
     }
 
-    const updateImgUrl = () => {
-        const newHash = getHash();
-        setImgUrl(`http://localhost:5000/${userId}#${newHash}`);
+    const getImageUrl = () => {
+        return `http://localhost:5000/${imageId}?${hash}`;
     }
 
     const ws = useRef<WebSocket>();
 
     const connectToSocket = () => {
-        if (ws.current != null){
+        if (ws.current != null) {
             ws.current.close();
         }
-        ws.current = new WebSocket(`ws://localhost:5000/${userId}`);
+        ws.current = new WebSocket(`ws://localhost:5000/${imageId}`);
 
         ws.current.addEventListener('open', (event) => {
             console.log("Connected to server");
@@ -32,29 +43,24 @@ function App() {
 
         ws.current.addEventListener('message', (event) => {
             console.log("[Message from server]", event.data);
-            updateImgUrl();
+            updateHash();
         });
     }
 
-    const sendMessage = (message: string) => {
-        if (ws.current != null) {
-            ws.current.send(message);
-        }
-    }
-
-    useEffect(updateImgUrl, []);
+    useEffect(() => {
+        connectToSocket();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
-        <div className="App">
-            <header className="App-header">
-                <img src={imgUrl} alt="logo" />
-                <input onChange={event => setUserId(event.target.value)} value={userId} />
-                <button onClick={event => {updateImgUrl()}}>Update image</button>
-                <button onClick={connectToSocket}>reconnect</button>
-                <button onClick={() => {sendMessage("hi")}}>send "hi" to the server</button>
-            </header>
+        <div className="image-container">
+            <img
+                src={getImageUrl()}
+                alt={"r/place canvas for " + imageId}
+            ></img>
         </div>
-    );
+    )
 }
+
 
 export default App;
