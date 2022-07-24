@@ -18,13 +18,13 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
     ws.send("welcome!");
 
     ws.on("message", (message) => {
-        console.log(`Received message: ${message}`)
+        console.log(`Received message: ${message}`);
         console.log(ws.listeners('connection').toString());
-        broadcastMessage(JSON.stringify(req))
+        broadcastMessage(JSON.stringify(req));
     });
 
     ws.on("close", () => {
-        console.log("client disconnected")
+        console.log("client disconnected");
     });
 })
 
