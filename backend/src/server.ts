@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import { isAlphanumeric, getImagePath } from './utils';
 
 import { UpdateRequestBody } from './types/UpdateRequest';
-import { updateImage } from './image_utils';
+import { generateNewImage, updateImage } from './image_utils';
 
 
 const app: Application = express();
@@ -41,11 +41,15 @@ app.get('/:imageId', (req: Request, res: Response) => {
     const imageId = req.params.imageId;
     const imagePath = getImagePath(imageId);
 
-    if (!fs.existsSync(imagePath)) {
-        // TODO: Implement createImage
-        console.log("Image doesn't exist yet.");
+    if (!isAlphanumeric(imageId)) {
+        console.log(`Invalid image id: ${imageId}`);
         res.end();
         return;
+    }
+
+    if (!fs.existsSync(imagePath)) {
+        console.log(`Generating image "${imageId}"`);
+        generateNewImage(imagePath);
     }
 
     res.sendFile(imagePath, { root: "." });
@@ -64,10 +68,8 @@ app.post('/update', (req: Request, res: Response) => {
 
     const imagePath = getImagePath(imageId);
     if (!fs.existsSync(imagePath)) {
-        // TODO: Implement createImage
-        console.log(`Image "${imageId}" doesn't exist (yet)`);
-        res.end();
-        return;
+        console.log(`Generating image "${imageId}"`);
+        generateNewImage(imagePath);
     }
 
     console.log(`Updating "${imageId}": setting (${x}, ${y}) to ${colour}`);
