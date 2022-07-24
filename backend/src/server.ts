@@ -1,8 +1,10 @@
 import express, { Application, Request, Response } from 'express';
-import * as fs from 'fs';
 import WebSocket from 'ws';
 
 import { Canvas, loadImage } from 'canvas';
+import * as fs from 'fs';
+
+import { isAlphanumeric, getImagePath } from './utils';
 
 import { UpdateRequestBody } from './types/UpdateRequest';
 
@@ -93,14 +95,3 @@ app.post('/update', (req: Request, res: Response) => {
     res.json(req.body);
 
 });
-
-
-const isAlphanumeric = (s: string): boolean => {
-    return /^\w+$/.test(s);
-}
-
-
-const getImagePath = (imageId: string): string => {
-    return `./assets/${imageId}.png`;
-}
-
