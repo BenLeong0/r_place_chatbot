@@ -1,7 +1,8 @@
 import { Canvas, loadImage } from 'canvas';
 import * as fs from 'fs';
+import { downloadImage } from './aws';
 
-import { fileExists } from './utils';
+import { fileExists, getImagePath } from './utils';
 
 
 export const generateNewImage = (
@@ -31,7 +32,17 @@ export const generateNewImage = (
 }
 
 
-export const generateNewImageIfFileNonExistent = (imagePath: string): void => {
+export const downloadImageIfFileNonExistent = (imageId: string): void => {
+    const imagePath = getImagePath(imageId);
+    if (!fileExists(imagePath)) {
+        console.log(`Downloading image ${imageId}`);
+        downloadImage(imageId);
+    }
+}
+
+
+export const generateNewImageIfFileNonExistent = (imageId: string): void => {
+    const imagePath = getImagePath(imageId);
     if (!fileExists(imagePath)) {
         console.log(`Generating image at ${imagePath}`);
         generateNewImage(imagePath);

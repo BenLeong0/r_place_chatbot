@@ -1,10 +1,11 @@
 import express, { Application, Request, Response } from 'express';
 import WebSocket from 'ws';
 
+import { uploadImage } from './aws';
+import { downloadImageIfFileNonExistent, generateNewImage, generateNewImageIfFileNonExistent, updateImage } from './image_utils';
 import { isAlphanumeric, getImagePath, fileExists } from './utils';
 
 import { CreateRequestBody, UpdateRequestBody } from './types/UpdateRequest';
-import { generateNewImage, generateNewImageIfFileNonExistent, updateImage } from './image_utils';
 
 
 const app: Application = express();
@@ -43,14 +44,15 @@ app.get('/:imageId', (req: Request, res: Response) => {
         return;
     }
 
-    const imagePath = getImagePath(imageId);
-    generateNewImageIfFileNonExistent(imagePath);
+    downloadImageIfFileNonExistent(imageId);
+    generateNewImageIfFileNonExistent(imageId);
 
+    const imagePath = getImagePath(imageId);
     res.sendFile(imagePath, { root: "." });
 });
 
 
-app.post('/update', (req: Request, res: Response) => {
+app.post('/update', async (req: Request, res: Response) => {
     const updateRequestBody: UpdateRequestBody = req.body;
     const { imageId, x, y, colour } = updateRequestBody;
 
@@ -60,11 +62,14 @@ app.post('/update', (req: Request, res: Response) => {
         return;
     }
 
-    const imagePath = getImagePath(imageId);
-    generateNewImageIfFileNonExistent(imagePath);
+    downloadImageIfFileNonExistent(imageId);
+    generateNewImageIfFileNonExistent(imageId);
 
     console.log(`Updating "${imageId}": setting (${x}, ${y}) to ${colour}`);
+    const imagePath = getImagePath(imageId);
     updateImage(imagePath, colour, x, y);
+
+    uploadImage(imageId);
 
     broadcastMessage(JSON.stringify({
         event: "imageUpdate",
