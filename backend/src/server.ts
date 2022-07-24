@@ -1,4 +1,4 @@
-import WebSocket, { WebSocketServer } from 'ws';
+import WebSocket from 'ws';
 import express, { Application, Request, Response } from 'express';
 
 const app: Application = express();
@@ -13,26 +13,24 @@ const broadcastMessage = (message: string) => {
     });
 }
 
-wss.on("connection", (ws: WebSocket) => {
+wss.on("connection", (ws: WebSocket, req: Request) => {
     console.log("A new client connected");
     ws.send("welcome!");
 
     ws.on("message", (message) => {
         console.log(`Received message: ${message}`);
-        broadcastMessage(`Received a message: ${message}`);
+        console.log(ws.listeners('connection').toString());
+        broadcastMessage(JSON.stringify(req));
     });
 
     ws.on("close", () => {
-        console.log("client disconnected")
+        console.log("client disconnected");
     });
 })
 
-app.get('/', (req: Request, res: Response) => {
-    console.log("hey")
-    wss.clients.forEach(client => {
-        console.log(client.readyState)
-    })
-    res.send([...wss.clients].join(" | "));
+app.get('/:userId', (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    res.sendFile(`/assets/${userId}.png`, { root: "." });
 });
 
 
