@@ -88,7 +88,7 @@ app.post('/update', (req: Request, res: Response) => {
         "imageId": imageId
     }));
 
-    res.json(req.body)
+    res.json(req.body);
 
 });
 
