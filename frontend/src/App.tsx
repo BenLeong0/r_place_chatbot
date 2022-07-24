@@ -5,8 +5,8 @@ import './App.css';
 
 function App() {
 
-    const [userId, setUserId] = useState<string>("4qs")
-    const [imgUrl, setImgUrl] = useState<string>("")
+    const [userId, setUserId] = useState<string>("4qs");
+    const [imgUrl, setImgUrl] = useState<string>("");
 
     const getHash = (): string => {
         const newHash = Math.floor(99999999 * Math.random());
@@ -14,7 +14,7 @@ function App() {
     }
 
     const updateImgUrl = () => {
-        const newHash = getHash()
+        const newHash = getHash();
         setImgUrl(`http://localhost:5000/${userId}#${newHash}`);
     }
 
@@ -37,12 +37,12 @@ function App() {
     }
 
     const sendMessage = (message: string) => {
-        if (ws.current != null){
+        if (ws.current != null) {
             ws.current.send(message);
         }
     }
 
-    useEffect(updateImgUrl, [])
+    useEffect(updateImgUrl, []);
 
     return (
         <div className="App">
