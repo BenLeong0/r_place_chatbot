@@ -13,7 +13,6 @@ const app: Application = express();
 app.use(express.json());
 
 const server = app.listen(5000, () => console.log("Server running"));
-
 const wss = new WebSocket.Server({ server });
 
 const broadcastMessage = (message: string) => {
