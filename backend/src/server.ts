@@ -1,12 +1,9 @@
 import express, { Application, Request, Response } from 'express';
 import WebSocket from 'ws';
 
-import { Canvas, loadImage } from 'canvas';
-import * as fs from 'fs';
+import { isAlphanumeric, getImagePath, fileExists } from './utils';
 
-import { isAlphanumeric, getImagePath } from './utils';
-
-import { UpdateRequestBody } from './types/UpdateRequest';
+import { CreateRequestBody, UpdateRequestBody } from './types/UpdateRequest';
 import { generateNewImage, generateNewImageIfFileNonExistent, updateImage } from './image_utils';
 
 
@@ -70,10 +67,39 @@ app.post('/update', (req: Request, res: Response) => {
     updateImage(imagePath, colour, x, y);
 
     broadcastMessage(JSON.stringify({
-        "event": "imageUpdate",
+        event: "imageUpdate",
+        imageId: imageId,
+    }));
+
+    res.json({ success: true });
+
+});
+
+
+app.post('/create', (req: Request, res: Response) => {
+    const updateRequestBody: CreateRequestBody = req.body;
+    const { imageId, width = 20, height = 20, colour = undefined } = updateRequestBody;
+
+    if (!isAlphanumeric(imageId)) {
+        console.log(`Invalid image id: ${imageId}`);
+        res.end();
+        return;
+    }
+
+    const imagePath = getImagePath(imageId);
+    if (fileExists(imagePath)) {
+        console.log(`Image ${imageId} already exists`)
+        res.end();
+        return;
+    }
+
+    generateNewImage(imagePath, width, height, colour);
+
+    broadcastMessage(JSON.stringify({
+        "event": "imageCreate",
         "imageId": imageId
     }));
 
-    res.json(req.body);
+    res.json({ success: true });
 
 });

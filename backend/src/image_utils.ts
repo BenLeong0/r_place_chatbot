@@ -1,6 +1,8 @@
 import { Canvas, loadImage } from 'canvas';
 import * as fs from 'fs';
 
+import { fileExists } from './utils';
+
 
 export const generateNewImage = (
     imagePath: string,
@@ -30,7 +32,7 @@ export const generateNewImage = (
 
 
 export const generateNewImageIfFileNonExistent = (imagePath: string): void => {
-    if (!fs.existsSync(imagePath)) {
+    if (!fileExists(imagePath)) {
         console.log(`Generating image at ${imagePath}`);
         generateNewImage(imagePath);
     }
